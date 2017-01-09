@@ -1,0 +1,189 @@
+﻿@{
+    ViewBag.Title = "About";
+}
+
+<h3>@ViewBag.Message</h3>
+
+<script>
+    function checkLoginStatus(response) {
+
+        console.log(response);
+
+        if (response.status === 'connected') {
+            //
+            //FB.api('/178483488900149', function (res) {
+
+            //    console.log(res);
+            //}, {
+            //    fields: 'category,name,members,description,link,cover,bio,personal_interests,fan_count,context,likes,personal_info,username',
+            //    edges: 'conversations,likes,picture'
+            //});
+
+            /*
+            FB.api("/me", { fields: 'id' }, function (response) {
+                if (response && !response.error) {
+                    console.log(response);
+                }
+            });
+            *//*
+            FB.api("/74100576336", function (response) {
+                if (response && !response.error) {
+                    console.log(response);
+                }
+            });*/
+            /*
+
+            FB.api("/74100576336/objects", function (response) {
+                if (response && !response.error) {
+                    console.log(response);
+                }
+            });*/
+
+
+            //FB.api("/74100576336/accounts", 'post', { fields: 'email' }, function (response) {
+            //    if (response && !response.error) {
+            //        console.log(response);
+            //    }
+            //});
+
+
+
+            //1255969317803944
+            //FB.api({ method: 'pages.isFan', page_id: '178483488900149', uid: '1255969317803944' }, function (resp) {
+
+            //    console.log(resp);
+            //    if (resp == true) {
+            //        console.info('user_id likes the Application.');
+            //    }
+            //    else if (resp.error_code) {
+            //        console.error(resp.error_code);
+            //    }
+            //    else {
+            //        console.error("user_id doesn't like the Application.");
+            //    }
+            //});
+
+
+            /* make the API call */
+            //FB.api("/me/accounts",
+            //    function (response) {
+            //        if (response && !response.error) {
+            //            console.log(response);
+            //        }
+            //    }
+            //);
+
+            //FB.api({
+            //    method: 'fql.query',
+            //    query: 'SELECT uid FROM page_fan WHERE uid=1255969317803944 AND page_id=178483488900149'
+            //}, function (resp) {
+            //    if (resp.length) {
+            //        alert('A fan!')
+            //        console.log(resp);
+            //    } else {
+            //        alert('Not a fan!');
+            //        console.log(resp);
+            //    }
+            //});
+
+
+
+            /* make the API call */
+            //FB.api(
+            //    "/me/og.likes",
+            //    function (response) {
+            //        if (response && !response.error) {
+            //            console.log(response);
+            //        }
+            //    }
+            //);
+
+
+
+            /* make the API call */
+            //FB.api(
+            //    "/1422106008059075/permissions",
+            //    function (response) {
+            //        if (response && !response.error) {
+            //            console.log(response);
+            //        }
+            //    }
+            //);
+
+
+            /* make the API call */
+            FB.api(
+                "/me/conversations",
+                {
+                    acess_token: 'EAAaQVj5nOAIBAKPZA1wB9qMaLZA12GfZAliZC62p3vxWQrKGORRYnEjqLSPuHSVKK78PVnqZBQx1WS4yWZAP3G0oXygTJJPHOD4se0C9uPWdxcxC1cPl2ySTJ8ZBDDPGO5v9HhA3XZAdzTQS3xfA3nVacLonOf7MZC528vT7rQhLlN5LX68REMb706TNbaJ8w2ndQvFqA3lAkMQZDZD'
+                },
+                function (res) {
+                    console.log(res);
+                }
+            );
+
+
+            // function to check for an empty object
+            function isEmpty(obj) {
+                for (var prop in obj) {
+                    if (obj.hasOwnProperty(prop))
+                        return false;
+                }
+
+                return true;
+            }
+
+
+
+
+            FB.api('/me/accounts', function (response) {
+                for (var i = 0, n = response.data.length; i < n; i++) {
+                    var page = response.data[i];
+                    console.log(page);
+                    FB.api('/' + page.id, function (res) {
+                        if (res && !res.error) {
+                            console.log(res);
+                        }
+                        else {
+                            console.log(res);
+                        }
+                    }, {
+                        fields: 'category,name,members,description,link,cover,bio,personal_interests,personal_info,context',
+                        edges: 'conversations,likes,picture,contact_email'
+                    });
+
+                    //FB.api({ method: 'pages.isFan', page_id: '1847549948803074', uid: 'user_id' }, function (resp) {
+                    //    if (resp == true) {
+                    //        console.info('user_id likes the Application.');
+                    //    } else if (resp.error_code) {
+                    //        console.error(resp.error_msg);
+                    //    } else {
+                    //        console.error("user_id doesn't like the Application.");
+                    //    }
+                    //});
+                }
+            });
+        }
+    }
+
+
+    window.fbAsyncInit = function () {
+        FB.init({
+            appId: '1847549948803074',
+            xfbml: true,
+            version: 'v2.8',
+            oauth: true
+        });
+        FB.getLoginStatus(checkLoginStatus);
+    };
+
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) { return; }
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+</script>
+<div class="fb-login-button"
+     data-scope="read_page_mailboxes,user_managed_groups,read_custom_friendlists,read_insights,manage_pages,publish_pages,pages_show_list,pages_manage_cta,pages_manage_instant_articles,pages_messaging,pages_messaging_phone_number,pages_messaging_subscriptions,user_friends" data-max-rows="10" data-size="large" data-show-faces="true" data-auto-logout-link="true" onlogin="checkLoginStatus"></div>

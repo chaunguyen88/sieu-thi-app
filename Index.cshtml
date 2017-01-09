@@ -1,0 +1,137 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook</title>
+    <link href="~/Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+</head>
+<body>
+    <script>
+        function checkLoginStatus(response) {
+            if (response.status === 'connected') {
+                FB.api('/me/accounts', function (response) {
+                    $('#pages').empty();
+                    for (var i = 0, n = response.data.length; i < n; i++) {
+                        var div = $('<div/>');
+                        var page = response.data[i];
+                        div.data('page', page);
+                        div.html(page.name);
+                        div.click(function () {
+                            load_conversations(this);
+                        });
+                        $('#pages').append(div);
+                    }
+                });
+            }
+        }
+
+        function load_conversations(c) {
+            var page = $(c).data('page');
+            FB.api('/me/conversations', {
+                access_token: page.access_token
+            }, function (resp) {
+                $('#conversations').empty();
+                for (var i = 0, n = resp.data.length; i < n; i++) {
+                    var conversation = resp.data[i];
+                    FB.api("/" + conversation.id,
+                    {
+                        access_token: page.access_token,
+                        fields: 'senders,unread_count,snippet,link,updated_time,participants'
+                    },
+                    function (conver) {
+                        if (conver.senders.data.length > 0) {
+                            var div = $('<div>');
+                            div.html(conver.senders.data[0].name + '(' + conver.unread_count + ')');
+                            conver.access_token = page.access_token;
+                            div.data('conversation', conver);
+                            div.click(function () {
+                                load_messages(this);
+                            });
+                            $('#conversations').append(div);
+                        }
+                    });
+                }
+            });
+        }
+
+        function load_messages(c) {
+            var conversation = $(c).data('conversation');
+            FB.api('/' + conversation.id + '/messages', {
+                access_token: conversation.access_token,
+                fields: 'message, id, tags'
+            }, function (messages) {
+                $('#messages').empty();
+                for (var i = 0, n = messages.data.length; i < n; i++) {
+                    var message = messages.data[i];
+                    FB.api('/' + message.id, {
+                        access_token: conversation.access_token,
+                        fields: 'created_time,from,message,id,tags'
+                    }, function (msg) {
+                        console.log(msg);
+                        var div = $('<div>');
+
+                        var d = msg.created_time;
+                        var my_date_format = function (d) {
+                            var month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                            var date = d.getDate() + " " + month[d.getMonth()] + ", " + d.getFullYear();
+                            var time = d.toLocaleTimeString().toLowerCase();
+                            return (date + " at " + time);
+                        }(new Date());
+
+                        console.log(my_date_format);
+                        div.html(msg.from.name + ': ' + my_date_format + ':' + msg.message);
+
+                        $('#times').prepend(div);
+                        $('#messages').prepend(div);
+                    });
+                }
+            });
+        }
+
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '1847549948803074',
+                xfbml: true,
+                version: 'v2.8'
+            });
+            FB.getLoginStatus(checkLoginStatus);
+        };
+
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/vi_VN/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+    <div class="fb-login-button"
+         data-scope="read_page_mailboxes,user_managed_groups,read_custom_friendlists,read_insights,manage_pages,publish_pages,pages_show_list,pages_manage_cta,pages_manage_instant_articles,pages_messaging,pages_messaging_phone_number,pages_messaging_subscriptions,user_friends"
+         data-max-rows="10"
+         data-size="large"
+         data-show-faces="true"
+         data-auto-logout-link="true"
+         onlogin="checkLoginStatus"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div id="pages"></div>
+            </div>
+            <div class="col-md-3">
+                <div id="conversations"></div>
+            </div>
+            <div class="col-md-3">
+                <div id="times"></div>
+                <div id="messages"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
